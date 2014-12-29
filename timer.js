@@ -52,7 +52,8 @@ t.API = function(){
     stop: function (clock){
       if(typeof clock != 'string') clock = 'default';
       this.clocks[clock].run = false;
-      this.API.reset(clock);
+      var scope = this.API();
+      scope.reset(clock);
 
     }.bind(this),
     reset: function (clock){
@@ -128,9 +129,11 @@ t.ticker = function (){
 
   }
   // if timers are empty of execs, ie: all are false
-  var request = Object.keys(this.clocks).map(function (key) {
-    if(this.clocks[key].run === true) return true
-  }.bind(this));
+  // var request = Object.keys(this.clocks).map(function (key) {
+  //   if(this.clocks[key].run === true) return true
+  // }.bind(this));
+
+  var request = clock.run;
 
   if(request){
     window.enterFrame(this.ticker.bind(this));    
@@ -196,7 +199,7 @@ e.tween({
     console.log('finiahed yo');
   }
 },2000)
-
+e.stop();
 e.tween({
   fn: function (step){
     console.log('2',step, this);
