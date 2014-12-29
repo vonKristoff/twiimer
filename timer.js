@@ -70,7 +70,8 @@ t.API = function(){
       if($this.exec[eventname]) { 
         delete $this.exec[eventname];
         if(Object.keys($this.exec).length < 1){
-          this.API.stop(clock);
+          var scope = this.API();
+          scope.stop(clock);
         }
       }
     }.bind(this),
@@ -89,10 +90,14 @@ t.API = function(){
 
 t.ticker = function (){
 
+  var run = 0;
+
   for (key in this.clocks){
         
     var clock = this.clocks[key]
     ,   interval = 1000/clock.fps;
+
+    if(clock.run) run++; // count clocks scheduled to run
           
     clock.now = Date.now();
     clock.delta = clock.now - clock.then;
@@ -119,7 +124,6 @@ t.ticker = function (){
             fin++;
           }
         }
-        console.log(clock.tween);
         if(Object.keys(clock.tween).length === fin) {
           console.log('removing tweens',clock.tween);
           clock.tween = {};
@@ -128,14 +132,8 @@ t.ticker = function (){
     }
 
   }
-  // if timers are empty of execs, ie: all are false
-  // var request = Object.keys(this.clocks).map(function (key) {
-  //   if(this.clocks[key].run === true) return true
-  // }.bind(this));
-
-  var request = clock.run;
-
-  if(request){
+  // if there are clocks still running - call enter frame
+  if(run > 0){
     window.enterFrame(this.ticker.bind(this));    
   }
 }
@@ -191,15 +189,16 @@ e.tween({
   fn: function (step){
     console.log('1',step, this);
     var tgt = 500;
-    this.x += (tgt - this.x) / 10;
+    this.x = tgt * step;
+    // this.x += (tgt - this.x) / 10;
     // this.css('opacity',step)
   }.bind(particle), // bind your target
   ease:'linear',
   callback: function(){
-    console.log('finiahed yo');
+    console.log('finiahed one');
   }
 },2000)
-e.stop();
+
 e.tween({
   fn: function (step){
     console.log('2',step, this);
@@ -209,7 +208,8 @@ e.tween({
   }.bind(particle), // bind your target
   ease:'linear',
   callback: function(){
-    console.log('finiahed yo');
+    console.log('finiahed two');
+    e.stop();
   }
 },1000)
 
