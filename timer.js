@@ -21,7 +21,7 @@ function Timer (){
 
   (function constructor(){
     // initialise standard clock 60 fps
-    this.clocks['default'] = new defaultClock(60); 
+    this.clocks['default'] = new defaultClock((1/60)); 
     
   }).bind(this)()    
 
@@ -82,7 +82,7 @@ t.API = function(){
       var $this = this.clocks[clock].tween
       ,   i = Object.keys($this).length; 
   
-      $this[i] = new Tween(duration, config.fn, config.ease, config.callback);
+      $this[i] = new Tweener(duration, config.fn, config.ease, config.callback);
       
     }.bind(this)
   }
@@ -95,7 +95,7 @@ t.ticker = function (){
   for (key in this.clocks){
         
     var clock = this.clocks[key]
-    ,   interval = 1000/clock.fps;
+    ,   interval = 1000 * clock.fps;
 
     if(clock.run) run++; // count clocks scheduled to run
           
@@ -138,7 +138,7 @@ t.ticker = function (){
   }
 }
 
-function Tween (duration, animate, ease, callback){
+function Tweener (duration, animate, ease, callback){
 
   this.progress = 0;
   this.duration = duration;
@@ -151,7 +151,7 @@ function Tween (duration, animate, ease, callback){
 
   return this
 }
-var tw = Tween.prototype;
+var tw = Tweener.prototype;
 
 tw.engine = function(clock, timepassed){
   
