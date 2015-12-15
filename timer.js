@@ -36,7 +36,6 @@ t.API = function() {
     }.bind(self),
     add: function (eventname, clock, callback, autostart){
       this.clocks[clock].exec[eventname] = callback;
-      console.log('adding', clock);
       if(autostart) this.methods.start(clock);
 
     }.bind(self),
@@ -107,8 +106,6 @@ t.ticker = function (){
 
       if (clock.delta > interval) {
 
-        if(key == 'default') console.log('default', clock.tween);
-        if(key != 'default') console.log('other', clock.tween);
         // reset time
         clock.then = clock.now - (clock.delta % interval);
         // events here
@@ -181,6 +178,3 @@ tw.ease = function (progress, type){
     break;
   }
 }
-
-
-
