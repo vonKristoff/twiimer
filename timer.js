@@ -30,17 +30,19 @@ function Timer (){
 
 var t = Timer.prototype;
 
-t.API = function(){
-  return {
+t.API = function() {
+  var self = this;
+  this.methods = {
     create: function(clock, fps){
       this.clocks[clock] = new buildClock(fps);
 
-    }.bind(this),
+    }.bind(self),
     add: function (eventname, clock, callback, autostart){
+      console.log('add',this);
       this.clocks[clock].exec[eventname] = callback;
-      if(autostart) this.start(clock);
+      if(autostart) this.methods.start(clock);
 
-    }.bind(this),
+    }.bind(self),
     start: function (clock){
       if(typeof clock != 'string') clock = 'default';
       var $this = this.clocks[clock];
@@ -48,14 +50,13 @@ t.API = function(){
       $this.count = 0;
       this.ticker();
 
-    }.bind(this),
+    }.bind(self),
     stop: function (clock){
       if(typeof clock != 'string') clock = 'default';
-      this.clocks[clock].run = false;
-      var scope = this.API();
-      scope.reset(clock);
+      this.clocks[clock].run = false;      
+      this.methods.reset(clock);
 
-    }.bind(this),
+    }.bind(self),
     reset: function (clock){
       if(typeof clock != 'string') clock = 'default';
       var $this = this.clocks[clock];
@@ -63,18 +64,17 @@ t.API = function(){
       $this.then = Date.now();
       $this.count = 0;
 
-    }.bind(this),
+    }.bind(self),
     remove: function (clock, eventname){
       if(typeof clock != 'string') clock = 'default';
       var $this = this.clocks[clock];
       if($this.exec[eventname]) { 
         delete $this.exec[eventname];
         if(Object.keys($this.exec).length < 1){
-          var scope = this.API();
-          scope.stop(clock);
+          this.methods.stop(clock);
         }
       }
-    }.bind(this),
+    }.bind(self),
     tween: function (config, duration, clock){
 
       if(typeof clock != 'string') clock = 'default';
@@ -84,9 +84,12 @@ t.API = function(){
   
       $this[i] = new Tweener(duration, config.fn, config.ease, config.callback);
       
-    }.bind(this)
+    }.bind(self)
   }
+  return this.methods
 }
+
+
 
 t.ticker = function (){
 
@@ -134,7 +137,7 @@ t.ticker = function (){
   }
   // if there are clocks still running - call enter frame
   if(run > 0){
-    window.enterFrame(this.ticker.bind(this));    
+    window.requestAnimationFrame(this.ticker.bind(this));    
   }
 }
 
@@ -175,43 +178,6 @@ tw.ease = function (progress, type){
     break;
   }
 }
-
-var particle = {
-  x:0,
-  y:0
-}
-
-var e = new Timer();
-
-e.start();
-
-e.tween({
-  fn: function (step){
-    console.log('1',step, this);
-    var tgt = 500;
-    this.x = tgt * step;
-    // this.x += (tgt - this.x) / 10;
-    // this.css('opacity',step)
-  }.bind(particle), // bind your target
-  ease:'linear',
-  callback: function(){
-    console.log('finiahed one');
-  }
-},2000)
-
-e.tween({
-  fn: function (step){
-    console.log('2',step, this);
-    var tgt = 500;
-    // this.x += (tgt - this.x) / 10;
-    // this.css('opacity',step)
-  }.bind(particle), // bind your target
-  ease:'linear',
-  callback: function(){
-    console.log('finiahed two');
-    e.stop();
-  }
-},1000)
 
 
 
