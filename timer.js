@@ -7,26 +7,23 @@ function Timer (){
 
   this.clocks = {};
 
-  function defaultClock (fps){
-    this.fps = fps;
-    this.run = false;
-    this.now = 0;
-    this.then = 0;
-    this.count = 0;
-    this.exec = {};
-    this.tween = {};
- 
-    return this;
-  }
-
-  (function constructor(){
-    // initialise standard clock 60 fps
-    this.clocks['default'] = new defaultClock((1/60)); 
-    
-  }).bind(this)()    
-
+  this.clocks['default'] = new buildClock(1/60);
+  
   return this.API()  
 };
+
+function buildClock (fps) {
+
+  this.fps = fps;
+  this.run = false;
+  this.now = 0;
+  this.then = 0;
+  this.count = 0;
+  this.exec = {};
+  this.tween = {};
+
+  return this
+}
 
 var t = Timer.prototype;
 
@@ -38,8 +35,8 @@ t.API = function() {
 
     }.bind(self),
     add: function (eventname, clock, callback, autostart){
-      console.log('add',this);
       this.clocks[clock].exec[eventname] = callback;
+      console.log('adding', clock);
       if(autostart) this.methods.start(clock);
 
     }.bind(self),
@@ -53,7 +50,7 @@ t.API = function() {
     }.bind(self),
     stop: function (clock){
       if(typeof clock != 'string') clock = 'default';
-      this.clocks[clock].run = false;      
+      this.clocks[clock].run = false;
       this.methods.reset(clock);
 
     }.bind(self),
@@ -66,6 +63,7 @@ t.API = function() {
 
     }.bind(self),
     remove: function (clock, eventname){
+
       if(typeof clock != 'string') clock = 'default';
       var $this = this.clocks[clock];
       if($this.exec[eventname]) { 
@@ -100,40 +98,45 @@ t.ticker = function (){
     var clock = this.clocks[key]
     ,   interval = 1000 * clock.fps;
 
-    if(clock.run) run++; // count clocks scheduled to run
-          
-    clock.now = Date.now();
-    clock.delta = clock.now - clock.then;
+    if(clock.run) {
 
-    if (clock.delta > interval) {
-      // reset time
-      clock.then = clock.now - (clock.delta % interval);
-      // events here
-      clock.count += 0.01;
+      run++; // count clocks scheduled to run
+            
+      clock.now = Date.now();
+      clock.delta = clock.now - clock.then;
 
-      // are there any functions attached to call
-      if(Object.keys(clock.exec).length > 0){
-        for(var callback in clock.exec){
-          clock.exec[callback](clock.count);
-        }
-      }
-      // if tween
-      if(Object.keys(clock.tween).length > 0){
-        var fin = 0;
-        for(var i=0;i<Object.keys(clock.tween).length;i++){
-          if(clock.tween[i].tweening){
-            clock.tween[i].engine(clock.tween[i], Date.now() - clock.tween[i].tweenstart);
-          } else {
-            fin++;
+      if (clock.delta > interval) {
+
+        if(key == 'default') console.log('default', clock.tween);
+        if(key != 'default') console.log('other', clock.tween);
+        // reset time
+        clock.then = clock.now - (clock.delta % interval);
+        // events here
+        clock.count += 0.01;
+
+        // are there any functions attached to call
+        if(Object.keys(clock.exec).length > 0){
+          for(var callback in clock.exec){
+            clock.exec[callback](clock.count);
           }
         }
-        if(Object.keys(clock.tween).length === fin) {
-          console.log('removing tweens',clock.tween);
-          clock.tween = {};
+        // if tween
+        if(Object.keys(clock.tween).length > 0){
+          var fin = 0;
+          for(var i=0;i<Object.keys(clock.tween).length;i++){
+            if(clock.tween[i].tweening){
+              clock.tween[i].engine(clock.tween[i], Date.now() - clock.tween[i].tweenstart);
+            } else {
+              fin++;
+            }
+          }
+          if(Object.keys(clock.tween).length === fin) {
+            console.log('removing tweens',clock.tween);
+            clock.tween = {};
+          }
         }
       }
     }
-
   }
   // if there are clocks still running - call enter frame
   if(run > 0){
