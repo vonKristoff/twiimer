@@ -49,3 +49,9 @@ The code comprises of two main features, a `timer` and a `tweener`. A default cl
 	  		console.log('finished');
 		}
 	},2000);
+	
+	// interval usage
+	
+	twi.add('interval-name', 'default', function () {
+		// do something on interval
+	}, 1000)
