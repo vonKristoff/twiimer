@@ -5,12 +5,12 @@
  */
 function buildClock (fps) {
 
-  this.fps = fps;
-  this.run = false;
-  this.now = 0;
-  this.then = 0;
+  this.fps   = fps;
+  this.run   = false;
+  this.now   = 0;
+  this.then  = 0;
   this.count = 0;
-  this.exec = {};
+  this.exec  = {};
   this.tween = {};
 
   return this
@@ -34,67 +34,78 @@ var t = Timer.prototype;
 /**
  * Available Public methods to use Twiimer
  */
-t.API = function() {
-  var self = this;
-  this.methods = {
-    create: function (clock, fps) {
-      this.clocks[clock] = new buildClock(fps);
+t.API = function () {
+    var self = this;
+    this.methods = {
+        create: function (clock, fps) {
 
-    }.bind(self),
-    add: function (eventname, callback, clock) {
-      if(typeof clock != 'string') clock = 'default';
-      this.clocks[clock].exec[eventname] = callback;
+            this.clocks[clock] = new buildClock(fps);
 
-    }.bind(self),
-    start: function (clock) {
-      if(typeof clock != 'string') clock = 'default';
-      var $this = this.clocks[clock];
-      $this.run = true;
-      $this.count = 0;
+        }.bind(self),
+        add: function (eventname, callback, clock) {
 
-      if(!this.enterFrame) {
-        this.ticker();
-        this.enterFrame = true;
-      }
+            if(typeof clock != 'string') clock = 'default';
+            this.clocks[clock].exec[eventname] = callback;
 
-    }.bind(self),
-    stop: function (clock) {
-      if(typeof clock != 'string') clock = 'default';
-      this.clocks[clock].run = false;
-      this.methods.reset(clock);
+        }.bind(self),
+        start: function (clock) {
 
-    }.bind(self),
-    reset: function (clock) {
-      if(typeof clock != 'string') clock = 'default';
-      var $this = this.clocks[clock];
-      $this.now = Date.now();
-      $this.then = Date.now();
-      $this.count = 0;
+            if(typeof clock != 'string') clock = 'default';
+            var $this = this.clocks[clock];
 
-    }.bind(self),
-    remove: function (clock, eventname) {
+            $this.run = true;
+            $this.count = 0;
 
-      if(typeof clock != 'string') clock = 'default';
-      var $this = this.clocks[clock];
-      if($this.exec[eventname]) { 
-        delete $this.exec[eventname];
-        if(Object.keys($this.exec).length < 1) {
-          this.methods.stop(clock);
-        }
-      }
-    }.bind(self),
-    tween: function (config, duration, clock){
+            if(!this.enterFrame) {
+                this.ticker();
+                this.enterFrame = true;
+            }
 
-      if(typeof clock != 'string') clock = 'default';
+        }.bind(self),
+        stop: function (clock) {
+            
+            if(typeof clock != 'string') clock = 'default';
 
-      var $this = this.clocks[clock].tween
-      ,   i = Object.keys($this).length; 
-  
-      $this[i] = new Tweener(duration, config.fn, config.ease, config.callback);
-      
-    }.bind(self)
-  }
-  return this.methods
+            this.clocks[clock].run = false;
+            this.methods.reset(clock);
+
+        }.bind(self),
+        reset: function (clock) {
+            
+            if(typeof clock != 'string') clock = 'default';
+            var $this = this.clocks[clock];
+
+            $this.now = Date.now();
+            $this.then = Date.now();
+            $this.count = 0;
+
+        }.bind(self),
+        remove: function (clock, eventname) {
+
+            if(typeof clock != 'string') clock = 'default';
+            var $this = this.clocks[clock];
+
+            if($this.exec[eventname]) {
+
+                delete $this.exec[eventname];
+
+                if(Object.keys($this.exec).length < 1) {
+                    this.methods.stop(clock);
+                }
+            }
+        }.bind(self),
+        tween: function (config, duration, clock){
+
+          if(typeof clock != 'string') clock = 'default';
+
+          var $this = this.clocks[clock].tween
+          ,   i = Object.keys($this).length; 
+
+          $this[i] = new Tweener(duration, config.fn, config.ease, config.callback);
+          
+        }.bind(self)
+    }
+    return this.methods
 }
 
 
@@ -164,14 +175,14 @@ t.ticker = function () {
  */
 function Tweener (duration, animate, ease, callback) {
 
-    this.progress = 0;
-    this.duration = duration;
-    this.type = ease;
-    this.tweening = true;
+    this.progress   = 0;
+    this.duration   = duration;
+    this.type       = ease;
+    this.tweening   = true;
     this.tweenstart = Date.now();
 
-    this.animate = animate;
-    this.callback = callback;
+    this.animate    = animate;
+    this.callback   = callback;
 
     return this
 }
@@ -187,7 +198,7 @@ tw.engine = function(clock, timepassed){
 
     this.animate(step);
 
-    if(this.progress === 1) {
+    if(this.progress == 1) {
         this.tweening = false;
         if(this.callback) this.callback();
     }
