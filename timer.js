@@ -3,9 +3,11 @@
  * @param  {num} fps interval rate (1 is 1 second : .5 is 500ms)
  * @return {object}     clock instance
  */
-function buildClock (fps) {
+function buildClock (fps, rangeMax) {
 
-  this.fps   = fps;
+  this.min   = fps;
+  this.max   = (rangeMax) ? rangeMax : null;
+  this.fps   = (rangeMax) ? getRandomRange(fps, rangeMax) : fps;
   this.run   = false;
   this.now   = 0;
   this.then  = 0;
@@ -37,9 +39,9 @@ var t = Timer.prototype;
 t.API = function () {
     var self = this;
     this.methods = {
-        create: function (clock, fps) {
-
-            this.clocks[clock] = new buildClock(fps);
+        create: function (clock, fps, rangeMax) {
+            // rangeMax starts a random clock interval between the fps min and rangeMax
+            this.clocks[clock] = new buildClock(fps, rangeMax);
 
         }.bind(self),
         add: function (eventname, callback, clock) {
@@ -108,6 +110,9 @@ t.API = function () {
     return this.methods
 }
 
+function getRandomRange (min, max) {
+  return min + (Math.random() * max)
+}
 
 /**
  * Animation Frame Handler
@@ -134,6 +139,9 @@ t.ticker = function () {
                 clock.then = clock.now - (clock.delta % interval);
                 // events here
                 clock.count += 0.01;
+
+                // if a random interval set new interval now
+                if(clock.max != null) clock.fps = getRandomRange(clock.min, clock.max)
 
                 // are there any functions attached to call
                 if (Object.keys(clock.exec).length > 0) {

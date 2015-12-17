@@ -27,6 +27,8 @@ The code comprises of two main features, a `timer` and a `tweener`. A default cl
 *	`remove` - remove an `executable` from a particular clock
 *	`tween` - call the tweener and bind a target
 
+It is now possible to create a random interval clock between a min / max range by passing a `rangeMax` value to the `create` method. _see example below_
+
 ---
 
 ##example usage
@@ -55,3 +57,7 @@ The code comprises of two main features, a `timer` and a `tweener`. A default cl
 	twi.add('interval-name', 'default', function () {
 		// do something on interval
 	}, 1000)
+
+	// create new random interval clock
+	// clock will now fire commands between 1 and 5 seconds
+	twi.create('random-interval', 1, 5);
